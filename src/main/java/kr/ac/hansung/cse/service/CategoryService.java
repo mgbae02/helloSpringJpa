@@ -42,10 +42,8 @@ public class CategoryService {
                 .ifPresent(c -> {
                     throw new DuplicateCategoryException(name);
                 });
-        // 신규 카테고리 저장
-        Category newCategory = new Category();
-        newCategory.setName(name);
-        return categoryRepository.save(newCategory);
+        // 신규 카테고리 저장 (Category의 기본 생성자는 JPA 전용 protected → name 생성자 사용)
+        return categoryRepository.save(new Category(name));
     }
 
     /**

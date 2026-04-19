@@ -131,4 +131,27 @@ public class ProductRepository {
             entityManager.remove(product);
         }
     }
+
+    /**
+     * 상품명에 키워드가 포함된 상품 검색 (JPQL LIKE, 부분 일치)
+     * category를 LEFT JOIN FETCH하여 목록 렌더링 시 LazyInitializationException 방지
+     */
+    public List<Product> findByNameContaining(String keyword) {
+        return entityManager.createQuery(
+                "SELECT p FROM Product p LEFT JOIN FETCH p.category " +
+                "WHERE p.name LIKE :keyword ORDER BY p.id ASC", Product.class)
+                .setParameter("keyword", "%" + keyword + "%")
+                .getResultList();
+    }
+
+    /**
+     * 카테고리 ID로 상품 필터링 (JPQL 경로 표현식 p.category.id 활용)
+     */
+    public List<Product> findByCategoryId(Long categoryId) {
+        return entityManager.createQuery(
+                "SELECT p FROM Product p LEFT JOIN FETCH p.category " +
+                "WHERE p.category.id = :cid ORDER BY p.id ASC", Product.class)
+                .setParameter("cid", categoryId)
+                .getResultList();
+    }
 }

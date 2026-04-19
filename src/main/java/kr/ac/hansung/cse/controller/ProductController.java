@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import kr.ac.hansung.cse.exception.ProductNotFoundException;
 import kr.ac.hansung.cse.model.Product;
 import kr.ac.hansung.cse.model.ProductForm;
+import kr.ac.hansung.cse.service.CategoryService;
 import kr.ac.hansung.cse.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,20 +38,43 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService,
+                             CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
 
     // ─────────────────────────────────────────────────────────────────
-    // GET /products - 상품 목록 조회
+    // GET /products - 상품 목록 조회 + 검색 (이름 LIKE, 카테고리 필터)
     // ─────────────────────────────────────────────────────────────────
 
+    /**
+     * @RequestParam(required = false):
+     *   - keyword, categoryId가 없을 때는 전체 목록을 반환합니다.
+     *   - keyword 우선: 검색어가 있으면 이름 검색, 없고 카테고리만 있으면 카테고리 필터.
+     *
+     * 드롭다운 렌더링과 선택 상태 유지를 위해 categories, keyword, categoryId를
+     * 모두 Model에 담아 뷰로 전달합니다.
+     */
     @GetMapping
-    public String listProducts(Model model) {
-        List<Product> products = productService.getAllProducts();
+    public String listProducts(@RequestParam(required = false) String keyword,
+                               @RequestParam(required = false) Long categoryId,
+                               Model model) {
+        List<Product> products;
+        if (keyword != null && !keyword.isBlank()) {
+            products = productService.searchByName(keyword);
+        } else if (categoryId != null) {
+            products = productService.searchByCategory(categoryId);
+        } else {
+            products = productService.getAllProducts();
+        }
         model.addAttribute("products", products);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("categoryId", categoryId);
         return "productList";
     }
 

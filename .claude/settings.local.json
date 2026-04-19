@@ -4,7 +4,11 @@
       "Bash(docker exec:*)",
       "Bash(mvn clean:*)",
       "WebFetch(domain:localhost)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(python -c ' *)",
+      "Bash(python3 *)",
+      "Bash(py --version)",
+      "Bash(mvn -q -DskipTests package)"
     ]
   }
 }

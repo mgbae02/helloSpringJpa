@@ -103,6 +103,51 @@
         color: #999;
         font-size: 1.1em;
       }
+      .search-form {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 16px 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .search-form input[type='text'],
+      .search-form select {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.95em;
+      }
+      .search-form button {
+        padding: 8px 16px;
+        background: #4a90d9;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .search-form button:hover {
+        background: #357abd;
+      }
+      .search-form .reset-link {
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.9em;
+      }
+      .nav-link {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-left: 8px;
+      }
+      .nav-link:hover {
+        background: #5a6268;
+      }
     </style>
   </head>
   <body>
@@ -119,9 +164,48 @@
     </div>
 
     <a class="btn" th:href="@{/products/create}">+ 새 상품 등록</a>
+    <a class="nav-link" th:href="@{/categories}">📂 카테고리 관리</a>
+
+    <!--
+        상품 검색 폼:
+        method="get" → URL 파라미터로 전송 (?keyword=...&categoryId=...)
+        th:value / th:selected 로 검색 후에도 입력 상태가 유지됩니다.
+    -->
+    <form class="search-form" th:action="@{/products}" method="get">
+      <input
+        type="text"
+        name="keyword"
+        th:value="${keyword}"
+        placeholder="상품명 검색"
+      />
+      <select name="categoryId">
+        <option value="">-- 전체 카테고리 --</option>
+        <option
+          th:each="cat : ${categories}"
+          th:value="${cat.id}"
+          th:text="${cat.name}"
+          th:selected="${categoryId != null and cat.id == categoryId}"
+        ></option>
+      </select>
+      <button type="submit">검색</button>
+      <a
+        class="reset-link"
+        th:if="${keyword != null or categoryId != null}"
+        th:href="@{/products}"
+        >초기화</a
+      >
+    </form>
 
     <div class="empty-msg" th:if="${#lists.isEmpty(products)}">
-      등록된 상품이 없습니다. 새 상품을 등록해 주세요.
+      <span th:if="${keyword != null and !keyword.isBlank()}"
+        >'<span th:text="${keyword}"></span>'에 대한 검색 결과가 없습니다.</span
+      >
+      <span th:if="${(keyword == null or keyword.isBlank()) and categoryId != null}"
+        >선택한 카테고리에 해당하는 상품이 없습니다.</span
+      >
+      <span th:if="${keyword == null and categoryId == null}"
+        >등록된 상품이 없습니다. 새 상품을 등록해 주세요.</span
+      >
     </div>
 
     <table th:unless="${#lists.isEmpty(products)}">

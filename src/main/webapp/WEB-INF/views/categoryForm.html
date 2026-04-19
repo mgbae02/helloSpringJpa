@@ -1,0 +1,84 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>카테고리 등록</title>
+    <style>
+      body {
+        font-family: 'Malgun Gothic', sans-serif;
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      .form-group {
+        margin: 20px 0;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      input[type='text'] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .error {
+        color: #d32f2f;
+        margin-top: 5px;
+        font-size: 13px;
+      }
+      .btn {
+        padding: 10px 20px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      .btn-cancel {
+        background: #999;
+        text-decoration: none;
+        display: inline-block;
+        margin-left: 10px;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>➕ 새 카테고리 등록</h1>
+
+    <form
+      th:action="@{/categories/create}"
+      th:object="${categoryForm}"
+      method="post"
+    >
+      <div class="form-group">
+        <label for="name">카테고리 이름</label>
+        <input
+          type="text"
+          id="name"
+          th:field="*{name}"
+          placeholder="예: 전자제품"
+        />
+        <div
+          class="error"
+          th:if="${#fields.hasErrors('name')}"
+          th:errors="*{name}"
+        ></div>
+      </div>
+
+      <button type="submit" class="btn">등록</button>
+      <a href="/categories" class="btn-cancel">취소</a>
+    </form>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+  </body>
+</html>
